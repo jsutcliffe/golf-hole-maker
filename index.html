@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Golf hole maker</title>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.4/css/bootstrap.min.css"/>
+    <link rel="stylesheet" href="css/style.css"/>
+
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+</head>
+<body>
+<div class="container">
+
+    <h1>Golf hole maker</h1>
+
+    <div>
+        <input type="file" id="file" />
+    </div>
+
+    <div class="row">
+
+        <div class="col-sm-8">
+
+            <canvas id="hole-canvas" width="500" height="500"></canvas>
+
+        </div>
+
+        <div class="col-sm-4">
+
+            <div id="color-picker" class="well"><ul><li><label for="color-ffffff" style="background-color: #ffffff">COLOR</label><input type="text" length="1" id="color-ffffff"></li>
+                <li><label for="color-3d88b8" style="background-color: #3d88b8">COLOR</label><input type="text" length="1" id="color-3d88b8"></li>
+                <li><label for="color-b5b1a3" style="background-color: #b5b1a3">COLOR</label><input type="text" length="1" id="color-b5b1a3"></li>
+                <li><label for="color-5b3e15" style="background-color: #5b3e15">COLOR</label><input type="text" length="1" id="color-5b3e15"></li>
+                <li><label for="color-c1272c" style="background-color: #c1272c">COLOR</label><input type="text" length="1" id="color-c1272c"></li>
+            </ul></div>
+
+        </div>
+    </div>
+</div>
+
+<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/underscore.js/1.8.3/underscore-min.js"></script>
+<script type="text/javascript" src="js/golfholemaker.js"></script>
+</body>
+</html>

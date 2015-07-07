@@ -1,0 +1,24 @@
+#color-picker ul {
+    list-style-type: none;
+    overflow: hidden;
+    padding-left: 0;
+}
+
+#color-picker label,
+#color-picker input[type=text] {
+    display: inline-block;
+    float: left;
+    height: 40px;
+    width: 40px;
+}
+
+#color-picker label {
+    clear: left;
+    text-indent: -999em;
+}
+
+#color-picker input[type=text] {
+    font-size: 20px;
+    line-height: 40px;
+    text-align: center;
+}
