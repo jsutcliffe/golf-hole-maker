@@ -1,5 +1,9 @@
 var golfHoleMaker = {
 
+    // values we need access to
+    valueArray: [],
+    imageWidth: 0,
+
     settings: {
         holeCanvas: document.querySelector('#hole-canvas'),
         colorPickerContainer: document.querySelector('#color-picker'),
@@ -13,14 +17,15 @@ var golfHoleMaker = {
             '<% for(var i = 0, il = colors.length; i < il; i++) { %>' +
             '<li>' +
             '<label for="color-<%= colors[i].hex.replace("#", "") %>" style="background-color: <%= colors[i].hex %>">COLOR</label>' +
-            '<input type="text" length="1" id="color-<%= colors[i].hex.replace("#", "") %>"/>' +
+            '<input value="<%= i %>" type="text" length="1" id="color-<%= colors[i].hex.replace("#", "") %>"/>' +
             '</li>\n' +
             '<% } %>' +
-            '</ul>'
+            '</ul>' +
+            '<button id="generateHoleString">Generate</button>'
     },
 
     /**
-     * Set up annecessary bits and pieces
+     * Set up any necessary bits and pieces
      */
     init: function () {
         this.bindEvents();
@@ -31,6 +36,7 @@ var golfHoleMaker = {
      */
     bindEvents: function () {
         document.getElementById('file').addEventListener('change', this.handleFileSelect, true);
+
     },
 
     /**
@@ -68,6 +74,8 @@ var golfHoleMaker = {
         if(image) {
             if(image.width <= this.settings.imageSizeThreshold && image.height <= this.settings.imageSizeThreshold)
 
+                this.imageWidth = image.width;
+
                 context.drawImage(image, 0, 0, image.width, image.height);
 
             golfHoleMaker.processImage(context.getImageData(0, 0, image.width, image.height));
@@ -81,42 +89,73 @@ var golfHoleMaker = {
      * @param imageData
      */
     processImage: function (imageData) {
-        var valueArray = [];
+        this.valueArray = [];
 
         for (var i = 0, il = imageData.data.length; i < il; i += 4) {
             var red = imageData.data[i];
             var green = imageData.data[i + 1];
             var blue = imageData.data[i + 2];
 
-            valueArray.push(this.rgbToHex(red, green, blue));
+            this.valueArray.push(this.rgbToHex(red, green, blue));
         }
 
-        this.createColorSelect(valueArray);
+        this.createColorSelect();
     },
 
     /**
      * Populate a set of inputs used to specify what type of tile to draw for each color in the processed image
      * @param valueArray
      */
-    createColorSelect: function (valueArray) {
-        if (allColors.length <= this.settings.colorCountThreshold) {
-            // reduce the array to unique values to determine how many colors we are dealing with
-            var allColors = _.unique(valueArray);
+    createColorSelect: function () {
+        // reduce the array to unique values to determine how many colors we are dealing with
+        var allColors = _.unique(this.valueArray);
 
+        if (allColors.length <= this.settings.colorCountThreshold) {
             // transform allColors into an array of objects for greater flexibility in the template
             for (var i = 0, il = allColors.length; i < il; i++) {
                 allColors[i] = {
                     hex: allColors[i],
                     short: i
                 }
-            };
+            }
 
             // render the color/tile type selection form
             var compiledTemplate = _.template(this.templates.colorPicker);
             this.settings.colorPickerContainer.innerHTML = compiledTemplate({colors: allColors});
+            document.getElementById('generateHoleString').addEventListener('click', this.generateHoleString, true);
         } else {
             alert('image has too many colors');
         }
+    },
+
+    generateHoleString: function (event) {
+        event.preventDefault();
+
+        var colorMapping = {};
+        var colorInputs = golfHoleMaker.settings.colorPickerContainer.querySelectorAll('input[type=text]');
+
+        // populate colorMapping object
+        _.each(colorInputs, function(element) {
+            colorMapping['#' + element.id.replace('color-', '')] = element.value;
+        });
+
+        // replace the hex codes with our single-character codes
+        var simplifiedValueArray = _.map(golfHoleMaker.valueArray, function (arg) {
+            return colorMapping[arg];
+        });
+
+        // we now have a fairly large 1d array
+        // chunk it into sections image.width wide
+        var targetWidth = golfHoleMaker.imageWidth;
+
+        var finalOutput = [];
+
+        for (var i = 0, il = simplifiedValueArray.length; i < il; i += targetWidth) {
+            var chunk = simplifiedValueArray.slice(i, i + targetWidth);
+            finalOutput.push(chunk.join(''));
+        }
+
+        console.log(finalOutput.join('!') + '!');
     },
 
     /**
